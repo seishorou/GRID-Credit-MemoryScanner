@@ -1,14 +1,7 @@
-Biblioteca
-/build.yml
+name: Build GRID Credit Memory Scanner
 
-name: Compilar GRID Credit Memory Scanner
-
-on:
+"on":
   workflow_dispatch:
-  push:
-    branches:
-      - main
-      - master
 
 jobs:
   build:
@@ -18,32 +11,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configurar MSVC x86
+      - name: Setup MSVC x86
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x86
 
-      - name: Compilar
+      - name: Build Win32 executable
         shell: cmd
-        run: |
-          cl /nologo /EHsc /O2 /MT ^
-          /D_WIN32_WINNT=0x0601 ^
-          /DWINVER=0x0601 ^
-          GRID_Credit_MemoryScanner.cpp ^
-          /link ^
-          /SUBSYSTEM:CONSOLE ^
-          /OUT:GRID_Credit_MemoryScanner.exe ^
-          psapi.lib
+        run: cl /nologo /EHsc /O2 /MT /D_WIN32_WINNT=0x0601 /DWINVER=0x0601 GRID_Credit_MemoryScanner.cpp /link /SUBSYSTEM:CONSOLE /OUT:GRID_Credit_MemoryScanner.exe psapi.lib
 
-      - name: Empacotar
+      - name: Create ZIP
         shell: powershell
         run: |
-          New-Item -ItemType Directory -Force pacote | Out-Null
-          Copy-Item GRID_Credit_MemoryScanner.exe pacote
-          Copy-Item LEIA-ME.txt pacote
-          Compress-Archive -Path pacote\* -DestinationPath GRID_Credit_MemoryScanner_Win32.zip -Force
+          New-Item -ItemType Directory -Force -Path package | Out-Null
+          Copy-Item GRID_Credit_MemoryScanner.exe package\
+          Copy-Item LEIA-ME.txt package\
+          Compress-Archive -Path package\* -DestinationPath GRID_Credit_MemoryScanner_Win32.zip -Force
 
-      - name: Publicar artefato
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: GRID-Credit-MemoryScanner-Win32
