@@ -1,6 +1,6 @@
 name: Build GRID Credit Memory Scanner
 
-"on":
+on:
   workflow_dispatch:
 
 jobs:
