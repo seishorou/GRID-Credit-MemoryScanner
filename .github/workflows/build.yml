@@ -1,0 +1,50 @@
+Biblioteca
+/build.yml
+
+name: Compilar GRID Credit Memory Scanner
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar MSVC x86
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+
+      - name: Compilar
+        shell: cmd
+        run: |
+          cl /nologo /EHsc /O2 /MT ^
+          /D_WIN32_WINNT=0x0601 ^
+          /DWINVER=0x0601 ^
+          GRID_Credit_MemoryScanner.cpp ^
+          /link ^
+          /SUBSYSTEM:CONSOLE ^
+          /OUT:GRID_Credit_MemoryScanner.exe ^
+          psapi.lib
+
+      - name: Empacotar
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force pacote | Out-Null
+          Copy-Item GRID_Credit_MemoryScanner.exe pacote
+          Copy-Item LEIA-ME.txt pacote
+          Compress-Archive -Path pacote\* -DestinationPath GRID_Credit_MemoryScanner_Win32.zip -Force
+
+      - name: Publicar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: GRID-Credit-MemoryScanner-Win32
+          path: GRID_Credit_MemoryScanner_Win32.zip
