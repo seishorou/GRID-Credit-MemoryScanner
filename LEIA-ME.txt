@@ -1,0 +1,69 @@
+GRID Credit Memory Scanner v1.0
+================================
+
+OBJETIVO
+--------
+Localizar possíveis variáveis de crédito do GRID.exe comparando a memória em
+três momentos:
+
+1. estado inicial;
+2. depois de inserir Coin;
+3. depois de pressionar Start.
+
+O utilitário é SOMENTE LEITURA. Ele não altera a memória, não aplica patches e
+não modifica o GRID.exe.
+
+COMPATIBILIDADE
+---------------
+- Windows 7 ou superior;
+- GRID.exe 32-bit;
+- JConfig ou TeknoParrot;
+- recomendado compilar como Win32/x86.
+
+COMO COMPILAR
+-------------
+Opção recomendada:
+
+1. Instale o Visual Studio com "Desenvolvimento para Desktop com C++".
+2. Abra o "x86 Native Tools Command Prompt for Visual Studio".
+3. Entre nesta pasta.
+4. Execute:
+   COMPILAR_WIN32.bat
+
+O executável GRID_Credit_MemoryScanner.exe será criado na mesma pasta.
+
+COMO USAR
+---------
+1. Execute GRID_Credit_MemoryScanner.exe como administrador.
+2. Abra o GRID pelo JConfig.
+3. Deixe o jogo parado na tela onde normalmente apareceria a solicitação de
+   crédito.
+4. Pressione F6 para tirar o snapshot INICIAL.
+5. Insira somente 1 crédito.
+6. Pressione F7 imediatamente.
+7. Pressione Start no jogo.
+8. Pressione F8 imediatamente.
+9. Aguarde aparecer "Analise concluida".
+10. Pressione F9 para sair.
+
+ARQUIVOS GERADOS
+----------------
+- GRID_Credit_MemoryScanner.log
+- GRID_Memory_Changes.csv
+- GRID_Credit_Candidates.csv
+
+Envie principalmente:
+- GRID_Credit_MemoryScanner.log
+- GRID_Credit_Candidates.csv
+
+OBSERVAÇÕES
+-----------
+- O scanner inclui regiões MEM_PRIVATE, onde normalmente ficam heaps e objetos
+  criados dinamicamente.
+- Também inclui regiões MEM_IMAGE graváveis.
+- Regiões maiores que 64 MiB são ignoradas para evitar capturar buffers de
+  vídeo ou alocações gigantes irrelevantes.
+- Faça as ações rapidamente para reduzir alterações causadas por temporizadores,
+  animações e contadores de frames.
+- Caso o relatório produza candidatos demais, faça um segundo teste deixando o
+  jogo parado exatamente na mesma tela antes do F6.
