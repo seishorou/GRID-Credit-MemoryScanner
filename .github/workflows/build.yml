@@ -5,31 +5,23 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup MSVC x86
+      - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x86
 
-      - name: Build Win32 executable
+      - name: Build
         shell: cmd
-        run: cl /nologo /EHsc /O2 /MT /D_WIN32_WINNT=0x0601 /DWINVER=0x0601 GRID_Credit_MemoryScanner.cpp /link /SUBSYSTEM:CONSOLE /OUT:GRID_Credit_MemoryScanner.exe psapi.lib
-
-      - name: Create ZIP
-        shell: powershell
         run: |
-          New-Item -ItemType Directory -Force -Path package | Out-Null
-          Copy-Item GRID_Credit_MemoryScanner.exe package\
-          Copy-Item LEIA-ME.txt package\
-          Compress-Archive -Path package\* -DestinationPath GRID_Credit_MemoryScanner_Win32.zip -Force
+          cl /nologo /EHsc /O2 /MT GRID_Credit_MemoryScanner.cpp /link psapi.lib /OUT:GRID_Credit_MemoryScanner.exe
 
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: GRID-Credit-MemoryScanner-Win32
-          path: GRID_Credit_MemoryScanner_Win32.zip
+          name: GRID_Credit_MemoryScanner
+          path: GRID_Credit_MemoryScanner.exe
