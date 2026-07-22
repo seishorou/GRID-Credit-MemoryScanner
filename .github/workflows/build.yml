@@ -1,4 +1,4 @@
-name: Build GRID Scanner
+name: Build GRID Scanner v2
 
 on: [push]
 
@@ -9,10 +9,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: x86
+          arch: x64
       - name: Compile
-        run: cl /EHsc /O2 /MT GRID_Credit_MemoryScanner.cpp /link psapi.lib user32.lib /OUT:GRID_Credit_MemoryScanner.exe
+        run: cl /EHsc /O2 /MT GRID_Credit_MemoryScanner.cpp /link psapi.lib user32.lib /OUT:GRID_Credit_MemoryScanner_v2.exe
       - uses: actions/upload-artifact@v4
         with:
-          name: GRID-Scanner
-          path: GRID_Credit_MemoryScanner.exe
+          name: GRID-Scanner-v2
+          path: GRID_Credit_MemoryScanner_v2.exe
