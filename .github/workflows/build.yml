@@ -1,6 +1,8 @@
-name: Build GRID Scanner v2
+name: Build GRID Scanner v3
 
-on: [push]
+on:
+  push:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,8 +13,8 @@ jobs:
         with:
           arch: x64
       - name: Compile
-        run: cl /EHsc /O2 /MT GRID_Credit_MemoryScanner.cpp /link psapi.lib user32.lib /OUT:GRID_Credit_MemoryScanner_v2.exe
+        run: cl /nologo /EHsc /O2 /MT /std:c++17 GRID_Credit_MemoryScanner.cpp /link /OUT:GRID_Credit_MemoryScanner_v3.exe
       - uses: actions/upload-artifact@v4
         with:
-          name: GRID-Scanner-v2
-          path: GRID_Credit_MemoryScanner_v2.exe
+          name: GRID-Scanner-v3
+          path: GRID_Credit_MemoryScanner_v3.exe
