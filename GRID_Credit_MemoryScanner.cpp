@@ -3,10 +3,10 @@
 // Read-only process memory scanner for GRID.exe
 //
 // Keys:
-// F6 = baseline snapshot
-// F7 = snapshot after COIN
-// F8 = snapshot after START + compare
-// F9 = finish
+// CTRL+SHIFT+F6 = baseline snapshot
+// CTRL+SHIFT+F7 = snapshot after COIN
+// CTRL+SHIFT+F8 = snapshot after START + compare
+// CTRL+SHIFT+F12 = finish
 //
 // Build as Win32/x86 for best compatibility with 32-bit GRID.exe.
 
@@ -401,10 +401,13 @@ static std::string ExecutableFolder() {
     return pos == std::string::npos ? "." : s.substr(0, pos);
 }
 
-static bool KeyPressed(int vk) {
+static bool ComboPressed(int vk) {
     static SHORT last[256]{};
+    const bool ctrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+    const bool shift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
     SHORT now = GetAsyncKeyState(vk);
-    bool pressed = (now & 0x8000) && !(last[vk] & 0x8000);
+    const bool down = (now & 0x8000) != 0;
+    const bool pressed = ctrl && shift && down && !(last[vk] & 0x8000);
     last[vk] = now;
     return pressed;
 }
@@ -413,15 +416,15 @@ int main() {
     const std::string folder = ExecutableFolder();
     gLog.open(folder + "\\GRID_Credit_MemoryScanner.log", std::ios::binary);
 
-    Log("GRID Credit Memory Scanner v1.0");
+    Log("GRID Credit Memory Scanner v2.0");
     Log("Modo SOMENTE LEITURA.");
-    Log("F6=Inicial | F7=Coin | F8=Start+Comparar | F9=Sair");
+    Log("CTRL+SHIFT+F6=Inicial | CTRL+SHIFT+F7=Coin | CTRL+SHIFT+F8=Start+Comparar | CTRL+SHIFT+F12=Sair");
     Log("Aguardando GRID.exe...");
 
     DWORD pid = 0;
     while (!pid) {
         pid = FindProcessId(kProcessName);
-        if (GetAsyncKeyState(VK_F9) & 0x8000) return 0;
+        if (ComboPressed(VK_F12)) return 0;
         Sleep(500);
     }
 
@@ -442,7 +445,7 @@ int main() {
     bool haveCoin = false;
     bool finished = false;
 
-    Log("Deixe o jogo parado na tela desejada e pressione F6 para o snapshot INICIAL.");
+    Log("Deixe o jogo parado na tela desejada e pressione CTRL+SHIFT+F6 para o snapshot INICIAL.");
 
     while (!finished) {
         if (WaitForSingleObject(process, 0) == WAIT_OBJECT_0) {
@@ -450,40 +453,40 @@ int main() {
             break;
         }
 
-        if (KeyPressed(VK_F6)) {
+        if (ComboPressed(VK_F6)) {
             initial = CaptureSnapshot(process, "INICIAL");
             haveInitial = !initial.empty();
             haveCoin = false;
             coin.clear();
             start.clear();
             if (haveInitial)
-                Log("Agora insira 1 credito e pressione F7 imediatamente.");
+                Log("Agora insira 1 credito e pressione CTRL+SHIFT+F7 imediatamente.");
         }
 
-        if (KeyPressed(VK_F7)) {
+        if (ComboPressed(VK_F7)) {
             if (!haveInitial) {
-                Log("F7 ignorado: pressione F6 primeiro.");
+                Log("CTRL+SHIFT+F7 ignorado: faca CTRL+SHIFT+F6 primeiro.");
             } else {
                 coin = CaptureSnapshot(process, "COIN");
                 haveCoin = !coin.empty();
                 if (haveCoin)
-                    Log("Agora pressione START no jogo e pressione F8 imediatamente.");
+                    Log("Agora pressione START no jogo e pressione CTRL+SHIFT+F8 imediatamente.");
             }
         }
 
-        if (KeyPressed(VK_F8)) {
+        if (ComboPressed(VK_F8)) {
             if (!haveInitial || !haveCoin) {
-                Log("F8 ignorado: faca F6 e F7 primeiro.");
+                Log("CTRL+SHIFT+F8 ignorado: faca CTRL+SHIFT+F6 e CTRL+SHIFT+F7 primeiro.");
             } else {
                 start = CaptureSnapshot(process, "START");
                 if (!start.empty()) {
                     CompareSnapshots(initial, coin, start, folder);
-                    Log("Analise concluida. Pressione F9 para sair.");
+                    Log("Analise concluida. Pressione CTRL+SHIFT+F12 para sair.");
                 }
             }
         }
 
-        if (KeyPressed(VK_F9)) {
+        if (ComboPressed(VK_F12)) {
             finished = true;
         }
 
